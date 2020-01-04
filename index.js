@@ -2,6 +2,9 @@ const http = require('http')
 
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
 
 let names = [
     {
@@ -48,6 +51,41 @@ app.get('/api/persons/:id', (request, response) => {
     } else {
         response.status(404).end()
     }
+})
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    names = names.filter(name => name.id !== id)
+
+    response.status(204).end()
+})
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    if (body.name === undefined) {
+        return response.status(400).json({ error: 'name missing' })
+    }
+    if (body.number === undefined) {
+        return response.status(400).json({ error: 'number missing' })
+    }
+    const sameName = names.filter(p => p.name === body.name)
+    const sameNumber = names.filter(p => p.number === body.number)
+    
+    if (sameName.length > 0) {
+        return response.status(400).json({ error: 'name must be unique' })
+    }
+    if (sameNumber.length > 0) {
+        return response.status(400).json({ error: 'number must be unique' })
+    }
+    const randomId = Math.floor(Math.random() * Math.floor(50000));
+    const person = {
+        id: randomId,
+        name: body.name,
+        number: body.number
+    }
+
+    names = names.concat(person)
+
+    response.json(person)
+
 })
 
 const PORT = 3001
