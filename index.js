@@ -1,12 +1,15 @@
 const http = require('http')
 
 const express = require('express')
+const fs = require('fs')
 const app = express()
 const bodyParser = require('body-parser')
+const path = require('path')
 const morgan = require('morgan')
 const cors = require('cors')
 
 app.use(bodyParser.json())
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
 
 morgan.token('body', (req) => {return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
@@ -45,7 +48,9 @@ app.get('/info', (req, res) => {
     const date = Date()
     res.send(`<p>Phonebook has info for ${maara} people </p><p>${date}</p>`)
 })
-
+app.get('/api', (req, res) => {
+    res.send('<h1>Jotain</h1>')
+  })
 app.get('/api/persons', (req, res) => {
     res.json(names)
 })
@@ -95,7 +100,7 @@ app.post('/api/persons', (request, response) => {
 
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
