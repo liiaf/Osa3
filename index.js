@@ -4,11 +4,14 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const cors = require('cors')
 
 app.use(bodyParser.json())
 
 morgan.token('body', (req) => {return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+
+app.use(cors())
 
 let names = [
     {
@@ -35,7 +38,7 @@ let names = [
 ]
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>')
+    res.send('<h1>Phonebook!</h1>')
 })
 app.get('/info', (req, res) => {
     var maara = names.length;
@@ -64,10 +67,10 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 app.post('/api/persons', (request, response) => {
     const body = request.body
-    if (body.name === undefined) {
+    if (body.name === "") {
         return response.status(400).json({ error: 'name missing' })
     }
-    if (body.number === undefined) {
+    if (body.number === "") {
         return response.status(400).json({ error: 'number missing' })
     }
     const sameName = names.filter(p => p.name === body.name)
