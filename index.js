@@ -56,15 +56,15 @@ app.get('/', (req, res) => {
 })
 app.get('/info', (req, res) => {
     Person
-      .find({})
-      .then(persons => res.send(`
+        .find({})
+        .then(persons => res.send(`
         <p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>
       `))
-      .catch(error => {
-        console.log(error);
-        res.status(500).end();
-      })
-  })
+        .catch(error => {
+            console.log(error);
+            res.status(500).end();
+        })
+})
 
 
 app.get('/api', (req, res) => {
@@ -125,7 +125,10 @@ app.post('/api/persons', (request, response) => {
         console.error(error.message)
         if (error.name === 'CastError' && error.kind == 'ObjectId') {
             return response.status(400).send({ error: 'malformatted id' })
+        } else if (error.name === 'ValidationError') {
+            return response.status(400).json({ error: error.message })
         }
+
         next(error)
     }
     app.use(errorHandler)
