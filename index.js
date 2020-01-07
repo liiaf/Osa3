@@ -11,6 +11,7 @@ const cors = require('cors')
 
 
 
+
 require('dotenv').config()
 app.use(express.static('build'))
 
@@ -105,8 +106,23 @@ app.post('/api/persons', (request, response) => {
     if (body.number === "") {
         return response.status(400).json({ error: 'number missing' })
     }
+    if (body.number.length < 8) {
+        return response.status(400).json({ error: 'Phonenumber has to contain of atleast 8 numbers' })
+    }
+    if (body.name.length < 3) {
+        return response.status(400).json({ error: 'Name has to contain of atleast 3 letters' })
+    }
+   
+    Person
+    .findOne({ name: body.name })
+    .then(result => {
+      if (result) {
+        return res.status(405).json({ error: 'name already in phonebook' })
+      }
+    })
+      
 
-    const randomId = Math.floor(Math.random() * Math.floor(100000))
+    const randomId = Math.floor(Math.random() * Math.floor(500000))
     const person = new Person({
         id: randomId,
         name: body.name,
@@ -115,6 +131,7 @@ app.post('/api/persons', (request, response) => {
 
     person.save().then(savedPerson => {
         response.json(savedPerson.toJSON())
+        
     })
     const unknownEndpoint = (request, response) => {
         response.status(404).send({ error: 'unknown endpoint' })
