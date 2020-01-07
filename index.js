@@ -54,12 +54,19 @@ let names = [
 app.get('/', (req, res) => {
     res.send('<h1>Phonebook!</h1>')
 })
-
 app.get('/info', (req, res) => {
-    var maara = names.length;
-    const date = Date()
-    res.send(`<p>Phonebook has info for ${maara} people </p><p>${date}</p>`)
-})
+    Person
+      .find({})
+      .then(persons => res.send(`
+        <p>Phonebook has info for ${persons.length} people</p><p>${new Date()}</p>
+      `))
+      .catch(error => {
+        console.log(error);
+        res.status(500).end();
+      })
+  })
+
+
 app.get('/api', (req, res) => {
     res.send('<h1>Jotain</h1>')
 })
